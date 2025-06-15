@@ -17,6 +17,7 @@ import java.util.Comparator;
 
 import static me.rtx4090.Token.TOKEN;
 import static me.rtx4090.download.Downloader.downloadPath;
+import static me.rtx4090.download.Downloader.runningItem;
 
 public class Main {
     public static JDA jda;
@@ -59,17 +60,34 @@ public class Main {
                 requester.openPrivateChannel().queue(channel -> channel.sendMessage(message).queue());
                 return;
             case "!progress":
-                requester.openPrivateChannel().queue(channel -> channel.sendMessage("This function is under development").queue());
+                //requester.openPrivateChannel().queue(channel -> channel.sendMessage("*This function is under development*").queue());
+                if (args.length != 2) return;
+                String id = args[1];
+                Item item = Downloader.urls.stream()
+                        .filter(i -> i.id.equals(id))
+                        .findFirst()
+                        .orElse(null);
+                if (item == null) {
+                    if (runningItem != null && runningItem.id.equals(id)) {
+                        item = runningItem;
+                        item.informRequester("Your request is currently being processed. It is at (0/" + Downloader.urls.size() + ") in the queue.");
+                        return;
+
+                    } else {
+                        requester.openPrivateChannel().queue(channel -> channel.sendMessage("A request with the provided id was not found.").queue());
+                        return;
+                    }
+                }
+                item.informRequester("Your request is at (" + Downloader.urls.size() + "/" + Downloader.urls.size() + ") in the queue.");
                 return;
             case "!dl":
-                if (args.length < 3) return;
+                if (args.length != 3) return;
 
                 info("Received command from " + requester.getName() + ": " + String.join(" ", args));
                 Item unverifiedItem = new Item(requester, args[1], args[2]);
                 itemVerify(unverifiedItem);
                 return;
         }
-        return;
     }
 
 
