@@ -15,7 +15,7 @@ import java.util.Queue;
 import java.util.UUID;
 
 public class Downloader {
-    private static final Queue<Item> urls = new LinkedList<>();
+    public static final Queue<Item> urls = new LinkedList<>();
     private static boolean running = false;
     public static final String downloadPath = "E:\\RTXs Lab\\git\\DiscordTube\\temp";
 
@@ -73,12 +73,13 @@ public class Downloader {
             streams.filter(filters).getFirst().download(downloadPath + "\\" + item.id + "\\", item.title);
             item.respondRequester(Path.of(downloadPath + "\\" + item.id + "\\", item.title + ".mp4"));
         } catch (Exception e0) {
-            Main.error(e0.getMessage());
+            Main.error("Error occurred at mp4 try one: " + e0.getMessage());
             try {
                 new Youtube(item.url).streams().getHighestResolution().download(downloadPath + "\\" + item.id + "\\", item.title);
                 item.respondRequester(Path.of(downloadPath + "\\" + item.id + "\\", item.title + ".mp4"));
             } catch (Exception e1) {
-                Main.error(e1.getMessage());
+                Main.error("Error occurred at mp4 try two: " + e1.getMessage());
+                item.informRequester("Your download request for " + item.title + " failed. ");
             }
         }
 

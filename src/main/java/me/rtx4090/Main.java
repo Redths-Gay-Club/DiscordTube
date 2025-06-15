@@ -46,9 +46,30 @@ public class Main {
     }
 
     public static void onComingCommand(User requester, String[] args) {
-        info("Received command from " + requester.getName() + ": " + String.join(" ", args));
-        Item unverifiedItem = new Item(requester, args[1], args[2]);
-        itemVerify(unverifiedItem);
+        switch (args[0]) {
+            case "!bug":
+                String bugList;
+                bugList = "Here's a List of Known Bug:\n" +
+                        "1. Video downloaded does not come with audio\n";
+                String message = "Hello " + requester.getName() + ",\n" +
+                        bugList +
+                        "If you encounter some new issue, please contact with _rtx on discord.\n" +
+                        "We will try to fix it ASAP\n" +
+                        "Thank you for your understanding!";
+                requester.openPrivateChannel().queue(channel -> channel.sendMessage(message).queue());
+                return;
+            case "!progress":
+                requester.openPrivateChannel().queue(channel -> channel.sendMessage("This function is under development").queue());
+                return;
+            case "!dl":
+                if (args.length < 3) return;
+
+                info("Received command from " + requester.getName() + ": " + String.join(" ", args));
+                Item unverifiedItem = new Item(requester, args[1], args[2]);
+                itemVerify(unverifiedItem);
+                return;
+        }
+        return;
     }
 
 
@@ -60,20 +81,15 @@ public class Main {
             //yt.checkAvailability(); // Throws if not valid/available
         } catch (Exception e) {
             error("Invalid or unavailable video: " + e.getMessage());
-            unverifiedItem.requester.openPrivateChannel().queue(channel -> {
-                channel.sendMessage("Your download request for " + unverifiedItem.url + " is invalid or unavailable.").queue();
-            });
+            unverifiedItem.informRequester("Your download request for " + unverifiedItem.url + " is invalid or unavailable.");
             return;
         }
 
         //send to download queue or return error to requester
         info("Command from " + unverifiedItem.requester.getName() + " is valid. Video title: " + unverifiedItem.title);
         Downloader.addUrl(unverifiedItem);
-        unverifiedItem.requester.openPrivateChannel().queue(channel -> {
-            channel.sendMessage("Your download request for " + unverifiedItem.title + " has been added to the queue.").queue();
-        });
-
-
+        unverifiedItem.informRequester("Your download request for " + unverifiedItem.title + " has been added to the queue at (" + Downloader.urls.size() + "/" + Downloader.urls.size() + ") with id ```" + unverifiedItem.id + "```\n" +
+                "You can check the progress of your download by using the command `!progress <id>`.");
     }
     public static void error(String message) {
         System.err.println("Error: " + message);
@@ -82,6 +98,17 @@ public class Main {
     public static void info(String message) {
         System.out.println("Info: " + message);
     }
+
+/*    public static void progress(User requester) {
+        Item item = Downloader.urls.stream()
+                .filter(item -> item.requester.getId().equals(requester.getId()))
+                .toList();
+        String message = "Hello " + requester.getName() + ",\n" +
+                "The bot is currently under development, so there is no progress to report.\n" +
+                "If you have any suggestions or feedback, please let us know!\n" +
+                "Thank you for your understanding!";
+        requester.openPrivateChannel().queue(channel -> channel.sendMessage(message).queue());
+    }*/
 
     public static void cleanTemp(Item item) {
         File directory = new File(downloadPath + File.separator + item.id);
