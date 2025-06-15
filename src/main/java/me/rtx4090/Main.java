@@ -16,8 +16,7 @@ import java.nio.file.Files;
 import java.util.Comparator;
 
 import static me.rtx4090.Token.TOKEN;
-import static me.rtx4090.download.Downloader.downloadPath;
-import static me.rtx4090.download.Downloader.runningItem;
+import static me.rtx4090.download.Downloader.*;
 
 public class Main {
     public static JDA jda;
@@ -47,6 +46,11 @@ public class Main {
     }
 
     public static void onComingCommand(User requester, String[] args) {
+        int requesterEntries = (int) urls.stream().filter(i -> i.requester.equals(requester)).count();
+        if (requesterEntries > 3) {
+            requester.openPrivateChannel().queue(channel -> channel.sendMessage("You have too many requests in the queue. Please wait for them to finish before making new requests.").queue());
+            return;
+        }
         switch (args[0]) {
             case "!bug":
                 String bugList;
@@ -63,14 +67,14 @@ public class Main {
                 //requester.openPrivateChannel().queue(channel -> channel.sendMessage("*This function is under development*").queue());
                 if (args.length != 2) return;
                 String id = args[1];
-                Item item = Downloader.urls.stream()
+                Item item = urls.stream()
                         .filter(i -> i.id.equals(id))
                         .findFirst()
                         .orElse(null);
                 if (item == null) {
                     if (runningItem != null && runningItem.id.equals(id)) {
                         item = runningItem;
-                        item.informRequester("Your request is currently being processed. It is at (0/" + Downloader.urls.size() + ") in the queue.");
+                        item.informRequester("Your request is currently being processed. It is at (0/" + urls.size() + ") in the queue.");
                         return;
 
                     } else {
@@ -78,7 +82,7 @@ public class Main {
                         return;
                     }
                 }
-                item.informRequester("Your request is at (" + Downloader.urls.size() + "/" + Downloader.urls.size() + ") in the queue.");
+                item.informRequester("Your request is at (" + urls.size() + "/" + urls.size() + ") in the queue.");
                 return;
             case "!dl":
                 if (args.length != 3) return;
@@ -96,7 +100,7 @@ public class Main {
         try {
             unverifiedItem.yt = new Youtube(unverifiedItem.url);
             unverifiedItem.title = unverifiedItem.yt.getTitle();
-            //yt.checkAvailability(); // Throws if not valid/available
+            // Throws if not valid/available
         } catch (Exception e) {
             error("Invalid or unavailable video: " + e.getMessage());
             unverifiedItem.informRequester("Your download request for " + unverifiedItem.url + " is invalid or unavailable.");
@@ -105,8 +109,8 @@ public class Main {
 
         //send to download queue or return error to requester
         info("Command from " + unverifiedItem.requester.getName() + " is valid. Video title: " + unverifiedItem.title);
-        Downloader.addUrl(unverifiedItem);
-        unverifiedItem.informRequester("Your download request for " + unverifiedItem.title + " has been added to the queue at (" + Downloader.urls.size() + "/" + Downloader.urls.size() + ") with id ```" + unverifiedItem.id + "```\n" +
+        addUrl(unverifiedItem);
+        unverifiedItem.informRequester("Your download request for " + unverifiedItem.title + " has been added to the queue at (" + urls.size() + "/" + urls.size() + ") with id ```" + unverifiedItem.id + "```\n" +
                 "You can check the progress of your download by using the command `!progress <id>`.");
     }
     public static void error(String message) {
