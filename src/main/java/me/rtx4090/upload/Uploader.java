@@ -9,7 +9,7 @@ import java.net.URL;
 
 public class Uploader {
 
-    public static String uploadFile(File file) {
+    public static String uploadFile(File file) { // this class is AI generated
         Main.info("A file is being uploaded: " + file.getName());
 
         OkHttpClient client = new OkHttpClient();

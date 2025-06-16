@@ -11,8 +11,6 @@ public class ReadyEventListener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         JDA jda = event.getJDA();
-        Main.info("Bot is ready! Logged in as: " + jda.getSelfUser().getName());
-
         Main.onReady();
 
     }
