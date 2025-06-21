@@ -11,6 +11,5 @@ public class MessageListener extends ListenerAdapter {
     public void onMessageReceived(@NotNull MessageReceivedEvent event) {
         String[] args = event.getMessage().getContentRaw().split(" ");
         Main.onComingCommand(event.getAuthor(), args);
-
     }
 }
