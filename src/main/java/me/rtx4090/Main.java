@@ -56,7 +56,7 @@ public class Main {
             case "!bug":
                 String bugList;
                 bugList = "Here's a List of Known Bug:\n" +
-                        "0.No bug >:)\n";
+                        "```0.No bug >:)\n```";
                 String message = "Hello " + requester.getName() + ",\n" +
                         bugList +
                         "If you encounter some new issue, please contact with _rtx on discord.\n" +
