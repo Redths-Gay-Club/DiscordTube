@@ -55,9 +55,10 @@ public class Main {
         switch (args[0]) {
             case "!bug":
                 String bugList;
-                bugList = "Here's a List of Known Bug:\n" +
+                bugList =
                         "```0.No bug >:)\n```";
                 String message = "Hello " + requester.getName() + ",\n" +
+                        "Here's a List of Known Bug:\n" +
                         bugList +
                         "If you encounter some new issue, please contact with _rtx on discord.\n" +
                         "We will try to fix it ASAP\n" +
@@ -121,6 +122,15 @@ public class Main {
                 Downloader.premiumDl(requestedPItem);
                 return;
 
+            case "!help":
+                String helpMessage = "Hello " + requester.getName() + ",\n" +
+                        "Here is the basic use of the bot:\n" +
+                        "`!dl <mp3/mp4> <YouTube url>` - Download a audio or video from YouTube.\n" +
+                        "`!progress <id>` - Check current progress for your download using a provided id.\n" +
+                        "`!bug` - Check current bug and the contact information to report further issues.";
+
+                requester.openPrivateChannel().queue(channel -> channel.sendMessage(helpMessage).queue());
+                return;
         }
     }
 
@@ -137,18 +147,21 @@ public class Main {
             return;
         }
         // check if video is too long
-        try {
-            int duration = unverifiedItem.yt.length().intValue();
-            if (duration > 7200) { // 2 hour in seconds
-                error("Video is too long: over 2 hours");
-                unverifiedItem.informRequester("Your download request for " + unverifiedItem.title + " is too long. Please choose a video shorter than 2 hour.");
+        if (unverifiedItem.format.equalsIgnoreCase("mp4")) {
+            try {
+                int duration = unverifiedItem.yt.length().intValue();
+                if (duration > 9000) { // 2.5 hour in seconds
+                    error("Video is too long: over 2 hours");
+                    unverifiedItem.informRequester("Your download request for " + unverifiedItem.title + " is too long. Please choose a video shorter than 2 hour.");
+                    return;
+                }
+            } catch (Exception e) {
+                error("Failed to retrieve video duration: " + e.getMessage());
+                unverifiedItem.informRequester("Your download request for " + unverifiedItem.title + " failed. Unable to retrieve video duration. Please try !bug and report this to the developer.");
                 return;
             }
-        } catch (Exception e) {
-            error("Failed to retrieve video duration: " + e.getMessage());
-            unverifiedItem.informRequester("Your download request for " + unverifiedItem.title + " failed. Unable to retrieve video duration. Please try !bug and report this to the developer.");
-            return;
         }
+
 
 
 
