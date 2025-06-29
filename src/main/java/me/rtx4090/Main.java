@@ -56,7 +56,7 @@ public class Main {
             case "!bug":
                 String bugList;
                 bugList =
-                        "```0.No bug >:)\n```";
+                        "```1. !progress command will always give you the queue position of your latest request\n```";
                 String message = "Hello " + requester.getName() + ",\n" +
                         "Here's a List of Known Bug:\n" +
                         bugList +
